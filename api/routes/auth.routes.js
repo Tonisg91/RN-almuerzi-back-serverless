@@ -11,26 +11,21 @@ const signToken = (_id) => {
     })
 }
 
-router.post('/signup', async (req, res) => {
-    try {
-        const { email, password } = req.body
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email y contraseña son necesarios' })
-        }
-
-        const existentUser = await Users.findOne({email}) 
-        if (existentUser) return res.status(400).json({message: 'El usuario ya existe'})
-
-        if (password.length < 6) {
-            res.status(400).json({ message: "La contraseña debe incluir al menos 6 caracteres." })
-            return
-        }
-        const passwordHash = bcrypt.hashSync(password, salt)
-        const newUser = await Users.create({ email, passwordHash })
-        return res.status(201).json(newUser)
-    } catch (error) {
-        res.status(500).json({message: 'Error al crear el usuario.'})
+router.post('/signup', (req, res) => {
+    const { email, password } = req.body
+    if (!email || !password) {
+        return res.send('Email y contraseña son necesarios')
     }
+    const passwordHash = bcrypt.hashSync(password, salt)
+    Users.findOne({ email }, (err, foundUser) => {
+        if (err) return res.send('Error al crear el usuario.')
+        if (foundUser) return res.send('Ya existe un usuario con ese email.')
+
+        Users.create({
+            email,
+            passwordHash
+        }).then(() => res.send('Usuario creado con éxito.'))
+    })
 })
 
 router.post('/login', async (req, res) => {
