@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const Orders = require('../models/Orders.model')
-const isAuthenticated = require('../auth/index')
+const { isAuthenticated, hasRoles } = require('../auth/index')
 
 
 router.get('/', async (req, res) => {
@@ -20,7 +20,7 @@ router.post('/', isAuthenticated, async (req, res) => {
     return res.status(201).json(newOrder)
 })
 
-router.put('/:id', isAuthenticated, async (req, res) => {
+router.put('/:id', isAuthenticated, hasRoles(['admin', 'user']), async (req, res) => {
     await Orders.findOneAndUpdate(req.params.id, req.body)
     res.sendStatus(204)
 })

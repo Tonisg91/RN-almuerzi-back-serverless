@@ -2,6 +2,7 @@ const router = require('express').Router()
 const bcrypt = require('bcrypt')
 const Users = require('../models/Users.model')
 const jwt = require('jsonwebtoken')
+const { isAuthenticated } = require('../auth')
 
 const salt = 10
 const signToken = (_id) => {
@@ -9,6 +10,7 @@ const signToken = (_id) => {
         expiresIn: 60 * 60 * 24 * 365
     })
 }
+
 router.post('/signup', async (req, res) => {
     try {
         const { email, password } = req.body
@@ -49,6 +51,10 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         return res.status(500).json({message: 'Error al iniciar sesion.'})
     }
+})
+
+router.get('/me', isAuthenticated, (req, res) => {
+    res.send(req.user)
 })
 
 module.exports = router

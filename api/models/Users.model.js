@@ -15,6 +15,10 @@ const UserSchema = mongoose.model('User', new Schema({
         type: String,
         required: [true, "Contraseña obligatoria"]
     },
+    role: {
+        type: String,
+        default: 'user' //or admin
+    }
 }))
 
 module.exports = UserSchema
